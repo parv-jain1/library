@@ -217,7 +217,7 @@ def code():
     Button(r,text='Return Books',width=20,height=1,command=lambda:(r.destroy(),Return()),bg='blue',fg='white',font='10',bd=5).pack(pady=15)
     Button(r,text='Details',width=20,height=1,command=lambda:(r.destroy(),details()),bg='blue',fg='white',font='10',bd=5).pack(pady=15)
     Button(r,text='Lend Books',width=20,height=1,command=lambda:(r.destroy(),issue()),bg='blue',fg='white',font='10',bd=5).pack(pady=15)
-    Button(r,text='Quit',width=20,height=1,command=r.destroy,bg='blue',fg='white',font='10',bd=5).pack(pady=15)
+    Button(r,text='Quit',width=20,height=1,command=lambda:(r.destroy(),p.close(),bg='blue',fg='white',font='10',bd=5).pack(pady=15)
     r.mainloop()
     
 
@@ -237,4 +237,4 @@ if __name__=='__main__' :
     except:
         pass
     code()
-    p.close()
+    

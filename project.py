@@ -4,7 +4,7 @@ def book():
     b=mys.fetchall()
     bid=b_id.get()
     b_id.delete(0,END)
-    title = b_name.get()
+    title = (b_name.get()).title()
     b_name.delete(0,END)
     author = b_author.get()
     b_author.delete(0,END)
@@ -26,7 +26,7 @@ def book():
         messagebox.showinfo('Success',"Book added successfully")
 def add():
     global b_id,top,b_name,b_author,b_no,b_cost
-    top=Toplevel()
+    top=Tk()
     top.geometry('1200x650')
     top.title('add books')
     top.configure(bg='yellow')
@@ -50,11 +50,11 @@ def add():
     b_cost=Entry(top,width=50,bd=5)
     b_cost.place(relx=0.45,rely=0.7)
     Button(top,text='submit',bd=5,command=book,font=('33'),height=2,width=10).place(relx=0.35,rely=0.85)
-    Button(top,text='quit',bd=5,command=top.destroy,font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)
+    Button(top,text='back',bd=5,command=lambda:(top.destroy(),code()),font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)
     top.mainloop()
 def issue():
     global i,b_id,c_id,s_name,class_,date
-    i=Toplevel()
+    i=Tk()
     i.geometry('1200x650')
     i.title('Issue Books')
     i.configure(bg='yellow')
@@ -75,7 +75,7 @@ def issue():
     date=Entry(i,width=50,bd=5)
     date.place(relx=0.45,rely=0.7)
     Button(i,text='submit',bd=5,command=book_issue,font=('33'),height=2,width=10).place(relx=0.35,rely=0.85)
-    Button(i,text='quit',bd=5,command=i.destroy,font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)    
+    Button(i,text='back',bd=5,command=lambda:(i.destroy(),code()),font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)    
     i.mainloop()
     
 def book_issue():
@@ -103,7 +103,7 @@ def book_issue():
     date.delete(0,END)
 def delete():
     global bid,b_id,t
-    t=Toplevel()
+    t=Tk()
     t.geometry('750x600')
     t.configure(bg='yellow')
     Label(t,text='Delete Books',font=("Helvetica", "32",'bold'),bg='#42E0D1',fg='yellow',relief='ridge',bd=20).pack(fill='x',side='top')
@@ -111,7 +111,7 @@ def delete():
     b_id=Entry(t,width=50,bd=5)
     b_id.place(relx=0.38,rely=0.35)
     Button(t,text='submit',bd=5,command=booksdel,font=('33'),height=2,width=10).place(relx=0.35,rely=0.85)
-    Button(t,text='quit',bd=5,command=t.destroy,font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)
+    Button(t,text='back',bd=5,command=lambda:(t.destroy(),code()),font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)
     t.mainloop()
 
 def booksdel():
@@ -130,7 +130,7 @@ def booksdel():
 
 def Return():
     global b_id,c_id
-    r=Toplevel()
+    r=Tk()
     r.geometry('1200x650')
     r.configure(bg='yellow')
     Label(r,text='Delete Books',font=("Helvetica", "32",'bold'),bg='#42E0D1',fg='yellow',relief='ridge',bd=20).pack(fill='x',side='top')
@@ -141,17 +141,18 @@ def Return():
     c_id=Entry(r,width=50,bd=5)
     c_id.place(relx=0.38,rely=0.45)
     Button(r,text='submit',bd=5,command=returnbooks,font=('33'),height=2,width=10).place(relx=0.35,rely=0.85)
-    Button(r,text='quit',bd=5,command=r.destroy,font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)
+    Button(r,text='Back',bd=5,command=lambda:(r.destroy(),code()),font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)
     r.mainloop()
 
 def details():
-    d=Toplevel()
+    d=Tk()
     d.geometry('600x600')
     d.configure(bg='yellow')
     Label(d,text='Details',font=("Helvetica", "32",'bold'),bg='#42E0D1',fg='yellow',relief='ridge',bd=20).pack(fill='x',side='top')
     Button(d,text='Book Details',width=20,height=2,command=detailsbooks,bg='blue',fg='white',font='10',bd=5).pack(pady=20)
     Button(d,text='Issue Details',width=20,height=2,command=detailsissues,bg='blue',fg='white',font='10',bd=5).pack(pady=20)
-    Button(d,text='Quit',width=20,height=1,command=d.destroy,bg='blue',fg='white',font='10',bd=5).pack(pady=20)
+    Button(d,text='back',width=20,height=1,command=lambda:(d.destroy(),code()),bg='blue',fg='white',font='10',bd=5).pack(pady=20)
+    
 def returnbooks():
     from tkinter import messagebox
     mys.execute('select book_id,student_id from issues')
@@ -166,11 +167,10 @@ def returnbooks():
         messagebox.showinfo('check again','book not issued')
 
 def detailsbooks():
-    import csv
     from tkinter import messagebox
     mys.execute('select * from books')
     q=mys.fetchall()
-    fh=open('books.csv','w')
+    fh=open('books.csv','w',newline='')
     b=csv.writer(fh)
     b.writerow(('book_id','name',' author','copies','cost','issued'))
     for i in q:
@@ -179,43 +179,55 @@ def detailsbooks():
     messagebox.showinfo('','data saved in storage')
 
 def detailsissues():
-    import csv
     from tkinter import messagebox
     mys.execute('select * from issues')
     q=mys.fetchall()
-    fh=open('issues.csv','w')
+    fh=open('issues.csv','w',newline='')
     b=csv.writer(fh)
-    b.writerow(('book_id','student_id','student_name','Class ','Date','return_status'))
+    b.writerow(('book_id','student_id','student_name','Class','Date','return_status'))
     for i in q:
         b.writerow(i)
     fh.close()
     messagebox.showinfo('','data saved in storage')
 
 def view():
-    n=Toplevel()
+    n=Tk()
     n.geometry('1200x650')
     n.configure(bg='red')
-    Label(r,text='View Books',font=("Helvetica", "32",'bold'),bg='#42E0D1',fg='yellow',relief='ridge',bd=20).pack(fill='x',side='top')
-    Label(n, text="%-10s%-30s%-20s%-20s%-20s%-20s"%('BID','Title','Author','copies','cost','issued'),bg='yellow',font=('times','12','italic')).place(relx=0.3,rely=0.05)
+    Label(n, text="%-30s%-50s%-40s%-30s%-40s%-40s"%('BID','Title','Author','copies','cost','issued'),bg='yellow',font=('times','12','italic')).place(relx=0.01,rely=0.05)
     mys.execute('select * from books')
     q=mys.fetchall()
     y=0.1
     for i in q:
-            Label(n,text="%-10s%-30s%-25s%-15s%-20s%-25s"%(i[0],i[1],i[2],i[3],i[4],i[5]) ,bg='black', fg='white',font=('times','12','italic')).place(relx=0.3,rely=y)
+            Label(n,text="%-30s%-50s%-40s%-30s%-40s%-40s"%(i[0],i[1],i[2],i[3],i[4],i[5]) ,bg='black', fg='white',font=('times','12','italic')).place(relx=0.01,rely=y)
             y += 0.05
+    Button(n,text='back',width=20,height=1,command=lambda:(n.destroy(),code()),bg='blue',fg='white',font='10',bd=5).place(relx=0.9,rely=0.9)
     n.mainloop()
+    
+def code():
+    global r
+    r=Tk()
+    r.geometry('1200x650')
+    r.configure(bg='#42E0D1')
+    r.title('library management system')
+    Label(r,text='Library Management System',font=("Helvetica", "34",'bold'),bg='#42E0D1',fg='yellow',relief='ridge',bd=20).pack(fill='x',side='top')
+    Button(r,text='Add Books',width=20,height=2,command=lambda:(r.destroy(),add()),bg='blue',fg='white',font='10',bd=5).pack(pady=10)
+    Button(r,text='Delete Books',width=20,height=2,command=lambda:(r.destroy(),delete()),bg='blue',fg='white',font='10',bd=5).pack(pady=10)
+    Button(r,text='View Books',width=20,height=2,command=lambda:(r.destroy(),view()),bg='blue',fg='white',font='10',bd=5).pack(pady=10)
+    Button(r,text='Return Books',width=20,height=2,command=lambda:(r.destroy(),Return()),bg='blue',fg='white',font='10',bd=5).pack(pady=10)
+    Button(r,text='Details',width=20,height=2,command=lambda:(r.destroy(),details()),bg='blue',fg='white',font='10',bd=5).pack(pady=10)
+    Button(r,text='Lend Books',width=20,height=2,command=lambda:(r.destroy(),issue()),bg='blue',fg='white',font='10',bd=5).pack(pady=10)
+    Button(r,text='Quit',width=20,height=2,command=r.destroy,bg='blue',fg='white',font='10',bd=5).pack(pady=10)
+    r.mainloop()
+    
+
 if __name__=='__main__' :
     from tkinter import *
     import mysql
     from mysql import connector
-    import fpdf
-    p=mysql.connector.connect(host='localhost',user='root',password='parvjain@1234')
+    import csv
+    p=mysql.connector.connect(host='localhost',user='root',password='parvjain@1234',database='library')
     mys=p.cursor()
-    try:
-        mys.execute('create database library')
-    except:
-        pass
-    p.database='library'
     try:
         mys.execute('create table books (book_id VARCHAR(8), name VARCHAR(255), author VARCHAR(255),copies int,cost int,issued int)')
     except:
@@ -224,17 +236,5 @@ if __name__=='__main__' :
         mys.execute('create table issues (book_id VARCHAR(8),student_id int,student_name VARCHAR(255), Class VARCHAR(10),Date DATE,return_status VARCHAR (255))') 
     except:
         pass
-    r=Tk()
-    r.geometry('1200x650')
-    r.configure(bg='#42E0D1')
-    r.title('library management system')
-    Label(r,text='Library Management System',font=("Helvetica", "32",'bold'),bg='#42E0D1',fg='yellow',relief='ridge',bd=20).pack(fill='x',side='top')
-    Button(r,text='Add Books',width=20,height=1,command=add,bg='blue',fg='white',font='10',bd=5).pack(pady=15)
-    Button(r,text='Delete Books',width=20,height=1,command=delete,bg='blue',fg='white',font='10',bd=5).pack(pady=15)
-    Button(r,text='View Books',width=20,height=1,command=view,bg='blue',fg='white',font='10',bd=5).pack(pady=15)
-    Button(r,text='Return Books',width=20,height=1,command=Return,bg='blue',fg='white',font='10',bd=5).pack(pady=15)
-    Button(r,text='Details',width=20,height=1,command=details,bg='blue',fg='white',font='10',bd=5).pack(pady=15)
-    Button(r,text='Lend Books',width=20,height=1,command=issue,bg='blue',fg='white',font='10',bd=5).pack(pady=15)
-    Button(r,text='Quit',width=20,height=1,command=r.destroy,bg='blue',fg='white',font='10',bd=5).pack(pady=15)
-    r.mainloop()
+    code()
     p.close()

@@ -24,6 +24,7 @@ def book():
         mys.execute(sql,val)
         p.commit()
         messagebox.showinfo('Success',"Book added successfully")
+        
 def add():
     global b_id,top,b_name,b_author,b_no,b_cost
     top=Tk()
@@ -52,6 +53,7 @@ def add():
     Button(top,text='submit',bd=5,command=book,font=('33'),height=2,width=10).place(relx=0.35,rely=0.85)
     Button(top,text='back',bd=5,command=lambda:(top.destroy(),code()),font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)
     top.mainloop()
+    
 def issue():
     global i,b_id,c_id,s_name,class_,date
     i=Tk()
@@ -71,24 +73,24 @@ def issue():
     Label(i,text='Student Class',font=('times','14','italic'),bg='yellow').place(relx=0.28,rely=0.6)
     class_=Entry(i,width=50,bd=5)
     class_.place(relx=0.45,rely=0.6)
-    Label(i,text='Date issued(yyyy-mm-dd)',font=('times','14','italic'),bg='yellow').place(relx=0.28,rely=0.7)
-    date=Entry(i,width=50,bd=5)
-    date.place(relx=0.45,rely=0.7)
     Button(i,text='submit',bd=5,command=book_issue,font=('33'),height=2,width=10).place(relx=0.35,rely=0.85)
     Button(i,text='back',bd=5,command=lambda:(i.destroy(),code()),font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)    
     i.mainloop()
     
 def book_issue():
     from tkinter import messagebox
+    import datetime
     bid=b_id.get()
     mys.execute('select copies,issued from books WHERE book_id="%s"'%(bid))
     b=mys.fetchone()
+    a=datetime.date.today()
+    c=a+datetime.timedelta(days=7)
     try:
         if b[1]<b[0]:
             mys.execute("UPDATE books SET issued = issued+%s WHERE book_id ='%s'"%(1,bid))
             p.commit()
-            sql = "INSERT INTO issues(book_id ,student_id,student_name , Class ,Date,return_status) VALUES (%s,%s,%s,%s,%s,%s) "
-            val = (bid,int(c_id.get()),s_name.get(),class_.get(),date.get(),'not returned')
+            sql = "INSERT INTO issues(book_id ,student_id,student_name , Class ,Date,return_date,return_status) VALUES (%s,%s,%s,%s,%s,%s,%s) "
+            val = (bid,int(c_id.get()),s_name.get(),class_.get(),a,c,'not returned')
             mys.execute(sql,val)
             p.commit()
             messagebox.showinfo('congrats','Book Issued')
@@ -100,7 +102,7 @@ def book_issue():
     c_id.delete(0,END)
     s_name.delete(0,END)
     class_.delete(0,END)
-    date.delete(0,END)
+    
 def delete():
     global bid,b_id,t
     t=Tk()
@@ -129,7 +131,7 @@ def booksdel():
     b_id.delete(0,END)
 
 def Return():
-    global b_id,c_id
+    global b_id,c_id,Date
     r=Tk()
     r.geometry('1200x650')
     r.configure(bg='yellow')
@@ -138,6 +140,7 @@ def Return():
     b_id=Entry(r,width=50,bd=5)
     b_id.place(relx=0.38,rely=0.35)
     Label(r,text='student Id',font=('times','14','italic'),bg='yellow').place(relx=0.25,rely=0.45)
+    Date=Entry(r,width=50,bd=5)
     c_id=Entry(r,width=50,bd=5)
     c_id.place(relx=0.38,rely=0.45)
     Button(r,text='submit',bd=5,command=returnbooks,font=('33'),height=2,width=10).place(relx=0.35,rely=0.85)
@@ -220,7 +223,6 @@ def code():
     Button(r,text='Quit',width=20,height=2,command=r.destroy,bg='blue',fg='white',font='10',bd=5).pack(pady=10)
     r.mainloop()
     
-
 if __name__=='__main__' :
     from tkinter import *
     import mysql
@@ -233,8 +235,11 @@ if __name__=='__main__' :
     except:
         pass
     try:
-        mys.execute('create table issues (book_id VARCHAR(8),student_id int,student_name VARCHAR(255), Class VARCHAR(10),Date DATE,return_status VARCHAR (255))') 
+        mys.execute('create table issues (book_id VARCHAR(8),student_id int,student_name VARCHAR(255), Class VARCHAR(10),Date DATE,return_date date ,return_status VARCHAR (255))') 
     except:
         pass
     code()
+    
     p.close()
+
+

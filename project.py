@@ -171,26 +171,38 @@ def returnbooks():
 
 def detailsbooks():
     from tkinter import messagebox
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.units import inch
+    from reportlab.platypus import SimpleDocTemplate
+    from reportlab.platypus.tables import Table,TableStyle,colors
     mys.execute('select * from books')
-    q=mys.fetchall()
-    fh=open('books.csv','w',newline='')
-    b=csv.writer(fh)
-    b.writerow(('book_id','name',' author','copies','cost','issued'))
-    for i in q:
-        b.writerow(i)
-    fh.close()
+    a=[('book id','name','author','copies','cost','issues')]+mys.fetchall()
+    my_path='books.pdf'
+    my_doc=SimpleDocTemplate(my_path,pagesize=A4)
+    c_width=[1*inch,1.5*inch,1*inch,1*inch,1*inch]
+    t=Table(a,rowHeights=20,repeatRows=1,colWidths=c_width)
+    t.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.lightgreen),('FONTSIZE',(0,0),(-1,-1),10)]))
+    elements=[]
+    elements.append(t)
+    my_doc.build(elements)
     messagebox.showinfo('','data saved in storage')
 
 def detailsissues():
     from tkinter import messagebox
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.units import inch
+    from reportlab.platypus import SimpleDocTemplate
+    from reportlab.platypus.tables import Table,TableStyle,colors
     mys.execute('select * from issues')
-    q=mys.fetchall()
-    fh=open('issues.csv','w',newline='')
-    b=csv.writer(fh)
-    b.writerow(('book_id','student_id','student_name','Class','Date','return_status'))
-    for i in q:
-        b.writerow(i)
-    fh.close()
+    a=[('book id' ,'student id','student name' , 'Class' ,'Date','return date','return status')]+mys.fetchall()
+    my_path='issues.pdf'
+    my_doc=SimpleDocTemplate(my_path,pagesize=A4)
+    c_width=[1*inch,1.5*inch,1*inch,1*inch,1*inch,1*inch,1*inch]
+    t=Table(a,rowHeights=20,repeatRows=1,colWidths=c_width)
+    t.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.lightgreen),('FONTSIZE',(0,0),(-1,-1),10)]))
+    elements=[]
+    elements.append(t)
+    my_doc.build(elements)
     messagebox.showinfo('','data saved in storage')
 
 def view():
@@ -214,13 +226,13 @@ def code():
     r.configure(bg='#42E0D1')
     r.title('library management system')
     Label(r,text='Library Management System',font=("Helvetica", "34",'bold'),bg='#42E0D1',fg='yellow',relief='ridge',bd=20).pack(fill='x',side='top')
-    Button(r,text='Add Books',width=20,height=2,command=lambda:(r.destroy(),add()),bg='blue',fg='white',font='10',bd=5).pack(pady=10)
-    Button(r,text='Delete Books',width=20,height=2,command=lambda:(r.destroy(),delete()),bg='blue',fg='white',font='10',bd=5).pack(pady=10)
-    Button(r,text='View Books',width=20,height=2,command=lambda:(r.destroy(),view()),bg='blue',fg='white',font='10',bd=5).pack(pady=10)
-    Button(r,text='Return Books',width=20,height=2,command=lambda:(r.destroy(),Return()),bg='blue',fg='white',font='10',bd=5).pack(pady=10)
-    Button(r,text='Details',width=20,height=2,command=lambda:(r.destroy(),details()),bg='blue',fg='white',font='10',bd=5).pack(pady=10)
-    Button(r,text='Lend Books',width=20,height=2,command=lambda:(r.destroy(),issue()),bg='blue',fg='white',font='10',bd=5).pack(pady=10)
-    Button(r,text='Quit',width=20,height=2,command=r.destroy,bg='blue',fg='white',font='10',bd=5).pack(pady=10)
+    Button(r,text='Add Books',width=20,height=1,command=lambda:(r.destroy(),add()),bg='blue',fg='white',font='10',bd=5).pack(pady=15)
+    Button(r,text='Delete Books',width=20,height=1,command=lambda:(r.destroy(),delete()),bg='blue',fg='white',font='10',bd=5).pack(pady=15)
+    Button(r,text='View Books',width=20,height=1,command=lambda:(r.destroy(),view()),bg='blue',fg='white',font='10',bd=5).pack(pady=15)
+    Button(r,text='Return Books',width=20,height=1,command=lambda:(r.destroy(),Return()),bg='blue',fg='white',font='10',bd=5).pack(pady=15)
+    Button(r,text='Details',width=20,height=1,command=lambda:(r.destroy(),details()),bg='blue',fg='white',font='10',bd=5).pack(pady=15)
+    Button(r,text='Lend Books',width=20,height=1,command=lambda:(r.destroy(),issue()),bg='blue',fg='white',font='10',bd=5).pack(pady=15)
+    Button(r,text='Quit',width=20,height=1,command=r.destroy,bg='blue',fg='white',font='10',bd=5).pack(pady=15)
     r.mainloop()
     
 if __name__=='__main__' :
@@ -239,7 +251,4 @@ if __name__=='__main__' :
     except:
         pass
     code()
-    
     p.close()
-
-

@@ -1,30 +1,3 @@
-def book():
-    from tkinter import messagebox
-    mys.execute('select book_id from books')
-    b=mys.fetchall()
-    bid=b_id.get()
-    b_id.delete(0,END)
-    title = (b_name.get()).title()
-    b_name.delete(0,END)
-    author = b_author.get()
-    b_author.delete(0,END)
-    no_of_copies = int(b_no.get())
-    b_no.delete(0,END)
-    cost = b_cost.get()
-    b_cost.delete(0,END)
-    issued=0
-    sql = "INSERT INTO books (book_id,name, author,copies,cost,issued) VALUES (%s,%s,%s,%s,%s,%s)"
-    try:
-        b.index((bid,))
-        mys.execute('update books set copies= copies+%s  where book_id="%s"'%(no_of_copies,bid))
-        p.commit()
-        messagebox.showinfo('Success',"Book added successfully")
-    except:
-        val = (bid,title, author,no_of_copies,cost,issued)
-        mys.execute(sql,val)
-        p.commit()
-        messagebox.showinfo('Success',"Book added successfully")
-        
 def add():
     global b_id,top,b_name,b_author,b_no,b_cost
     top=Tk()
@@ -54,6 +27,33 @@ def add():
     Button(top,text='back',bd=5,command=lambda:(top.destroy(),code()),font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)
     top.mainloop()
     
+def book():
+    from tkinter import messagebox
+    mys.execute('select book_id from books')
+    b=mys.fetchall()
+    bid=b_id.get()
+    b_id.delete(0,END)
+    title = (b_name.get()).title()
+    b_name.delete(0,END)
+    author = b_author.get()
+    b_author.delete(0,END)
+    no_of_copies = int(b_no.get())
+    b_no.delete(0,END)
+    cost = b_cost.get()
+    b_cost.delete(0,END)
+    issued=0
+    sql = "INSERT INTO books (book_id,name, author,copies,cost,issued) VALUES (%s,%s,%s,%s,%s,%s)"
+    try:
+        b.index((bid,))
+        mys.execute('update books set copies= copies+%s  where book_id="%s"'%(no_of_copies,bid))
+        p.commit()
+        messagebox.showinfo('Success',"Book added successfully")
+    except:
+        val = (bid,title, author,no_of_copies,cost,issued)
+        mys.execute(sql,val)
+        p.commit()
+        messagebox.showinfo('Success',"Book added successfully")
+        
 def issue():
     global i,b_id,c_id,s_name,class_,date
     i=Tk()
@@ -85,12 +85,13 @@ def book_issue():
     b=mys.fetchone()
     a=datetime.date.today()
     c=a+datetime.timedelta(days=7)
+    print(a,c)
     try:
         if b[1]<b[0]:
             mys.execute("UPDATE books SET issued = issued+%s WHERE book_id ='%s'"%(1,bid))
             p.commit()
             sql = "INSERT INTO issues(book_id ,student_id,student_name , Class ,Date,return_date,return_status) VALUES (%s,%s,%s,%s,%s,%s,%s) "
-            val = (bid,int(c_id.get()),s_name.get(),class_.get(),a,c,'not returned')
+            val = (bid,int(c_id.get()),s_name.get(),class_.get(),a,'-','not returned')
             mys.execute(sql,val)
             p.commit()
             messagebox.showinfo('congrats','Book Issued')
@@ -131,22 +132,43 @@ def booksdel():
     b_id.delete(0,END)
 
 def Return():
-    global b_id,c_id,Date
+    global b_id,c_id,r_date
     r=Tk()
     r.geometry('1200x650')
     r.configure(bg='yellow')
-    Label(r,text='Delete Books',font=("Helvetica", "32",'bold'),bg='#42E0D1',fg='yellow',relief='ridge',bd=20).pack(fill='x',side='top')
-    Label(r,text='Book Id',font=('times','14','italic'),bg='yellow').place(relx=0.25,rely=0.35)
+    Label(r,text='Return books',font=("Helvetica", "32",'bold'),bg='#42E0D1',fg='yellow',relief='ridge',bd=20).pack(fill='x',side='top')
+    Label(r,text='Book Id',font=('times','14','italic'),bg='yellow').place(relx=0.20,rely=0.35)
     b_id=Entry(r,width=50,bd=5)
     b_id.place(relx=0.38,rely=0.35)
-    Label(r,text='student Id',font=('times','14','italic'),bg='yellow').place(relx=0.25,rely=0.45)
-    Date=Entry(r,width=50,bd=5)
+    Label(r,text='student Id',font=('times','14','italic'),bg='yellow').place(relx=0.20,rely=0.45)
     c_id=Entry(r,width=50,bd=5)
     c_id.place(relx=0.38,rely=0.45)
+    Label(r,text='Return Date(yyyy-mm-dd)',font=('times','14','italic'),bg='yellow').place(relx=0.20,rely=0.55)
+    r_date=Entry(r,width=50,bd=5)
+    r_date.place(relx=0.38,rely=0.55)
     Button(r,text='submit',bd=5,command=returnbooks,font=('33'),height=2,width=10).place(relx=0.35,rely=0.85)
     Button(r,text='Back',bd=5,command=lambda:(r.destroy(),code()),font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)
     r.mainloop()
-
+    
+def returnbooks():
+    from tkinter import messagebox
+    import datetime
+    mys.execute('select book_id,student_id,return_status from issues')
+    q=mys.fetchall()
+    print(q,q[0][2])
+    if (b_id.get() ,int(c_id.get()),'not returned') in q :
+        mys.execute('update issues set return_status="returned" where book_id="%s" and student_id="%s"'%(b_id.get(),c_id.get()))
+        p.commit()
+        mys.execute('update issues set return_date="%s" where book_id="%s" and student_id="%s"'%(r_date.get(),b_id.get(),c_id.get()))
+        p.commit()
+        mys.execute('update books set issued=issued-%s where book_id="%s"'%(1,b_id.get()))
+        p.commit()
+        messagebox.showinfo('','book returned')
+        print(mys.fetchall())
+        
+    else:
+        messagebox.showinfo('check again','book not issued')
+        
 def details():
     d=Tk()
     d.geometry('600x600')
@@ -155,20 +177,8 @@ def details():
     Button(d,text='Book Details',width=20,height=2,command=detailsbooks,bg='blue',fg='white',font='10',bd=5).pack(pady=20)
     Button(d,text='Issue Details',width=20,height=2,command=detailsissues,bg='blue',fg='white',font='10',bd=5).pack(pady=20)
     Button(d,text='back',width=20,height=1,command=lambda:(d.destroy(),code()),bg='blue',fg='white',font='10',bd=5).pack(pady=20)
+    d.mainloop()
     
-def returnbooks():
-    from tkinter import messagebox
-    mys.execute('select book_id,student_id from issues')
-    q=mys.fetchall()
-    if (b_id.get(),int(c_id.get())) in q:
-        mys.execute('update issues set return_status="returned" where book_id="%s" and student_id="%s"'%(b_id.get(),c_id.get()))
-        p.commit()
-        mys.execute('update books set issued=issued-%s where book_id="%s"'%(1,b_id.get()))
-        p.commit()
-        messagebox.showinfo('','book returned')
-    else:
-        messagebox.showinfo('check again','book not issued')
-
 def detailsbooks():
     from tkinter import messagebox
     from reportlab.lib.pagesizes import A4
@@ -247,7 +257,7 @@ if __name__=='__main__' :
     except:
         pass
     try:
-        mys.execute('create table issues (book_id VARCHAR(8),student_id int,student_name VARCHAR(255), Class VARCHAR(10),Date DATE,return_date date ,return_status VARCHAR (255))') 
+        mys.execute('create table issues (book_id VARCHAR(8),student_id int,student_name VARCHAR(255), Class VARCHAR(10),Date DATE,return_date varchar(255) ,return_status VARCHAR (255))') 
     except:
         pass
     code()

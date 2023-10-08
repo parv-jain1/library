@@ -2,7 +2,7 @@ def add():
     global b_id,top,b_name,b_author,b_no,b_cost
     top=Tk()
     top.geometry('1200x650')
-    top.title('add books')
+    top.title('Add Books')
     top.configure(bg='yellow')
     Label(top,text='ADD BOOKS',font=("Helvetica", "32",'bold'),bg='blue',fg='yellow',relief='ridge',bd=20).pack(fill='x',side='top')
     l=Label(top,text='Book ID',font=('times','14','italic'),bg='yellow').place(relx=0.28,rely=0.3)
@@ -84,8 +84,6 @@ def book_issue():
     mys.execute('select copies,issued from books WHERE book_id="%s"'%(bid))
     b=mys.fetchone()
     a=datetime.date.today()
-    c=a+datetime.timedelta(days=7)
-    print(a,c)
     try:
         if b[1]<b[0]:
             mys.execute("UPDATE books SET issued = issued+%s WHERE book_id ='%s'"%(1,bid))
@@ -152,22 +150,34 @@ def Return():
     
 def returnbooks():
     from tkinter import messagebox
-    import datetime
+    from datetime import datetime
     mys.execute('select book_id,student_id,return_status from issues')
     q=mys.fetchall()
-    print(q,q[0][2])
     if (b_id.get() ,int(c_id.get()),'not returned') in q :
-        mys.execute('update issues set return_status="returned" where book_id="%s" and student_id="%s"'%(b_id.get(),c_id.get()))
+        mys.execute('update issues set return_date="%s" where book_id="%s" and student_id="%s" and return_status="not returned"'%(r_date.get(),b_id.get(),c_id.get()))
         p.commit()
-        mys.execute('update issues set return_date="%s" where book_id="%s" and student_id="%s"'%(r_date.get(),b_id.get(),c_id.get()))
+        mys.execute('update issues set return_status="returned" where book_id="%s" and student_id="%s"'%(b_id.get(),c_id.get()))
         p.commit()
         mys.execute('update books set issued=issued-%s where book_id="%s"'%(1,b_id.get()))
         p.commit()
-        messagebox.showinfo('','book returned')
-        print(mys.fetchall())
-        
+        mys.execute('select Date from issues where book_id="%s" and student_id="%s" and return_date="%s"'%(b_id.get(),c_id.get(),r_date.get()))
+        sd=mys.fetchall()
+        sd=sd[0][0]
+        df=datetime.strptime(r_date.get(),"%Y-%m-%d")
+        df=datetime.date(df)
+        de=(df-sd).days
+        if int(de)>7:
+            c=(de-7)*50
+            mys.execute('update issues set fine=%s where book_id="%s" and student_id="%s" and return_date="%s"'%(c,b_id.get(),c_id.get(),r_date.get()))
+            p.commit()
+            messagebox.showinfo('',f'book returned please pay {c} as fine')
+        else:
+            messagebox.showinfo('','book returned')
     else:
         messagebox.showinfo('check again','book not issued')
+    b_id.delete(0,END)
+    c_id.delete(0,END)
+    r_date.delete(0,END)
         
 def details():
     d=Tk()
@@ -188,7 +198,7 @@ def detailsbooks():
     mys.execute('select * from books')
     a=[('book id','name','author','copies','cost','issues')]+mys.fetchall()
     my_path='books.pdf'
-    my_doc=SimpleDocTemplate(my_path,pagesize=A4)
+    my_doc=SimpleDocTemplate(my_path,pagesize=A4,title='Books')
     c_width=[1*inch,1.5*inch,1*inch,1*inch,1*inch]
     t=Table(a,rowHeights=20,repeatRows=1,colWidths=c_width)
     t.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.lightgreen),('FONTSIZE',(0,0),(-1,-1),10)]))
@@ -206,7 +216,7 @@ def detailsissues():
     mys.execute('select * from issues')
     a=[('book id' ,'student id','student name' , 'Class' ,'Date','return date','return status')]+mys.fetchall()
     my_path='issues.pdf'
-    my_doc=SimpleDocTemplate(my_path,pagesize=A4)
+    my_doc=SimpleDocTemplate(my_path,pagesize=A4,title='Issues')
     c_width=[1*inch,1.5*inch,1*inch,1*inch,1*inch,1*inch,1*inch]
     t=Table(a,rowHeights=20,repeatRows=1,colWidths=c_width)
     t.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.lightgreen),('FONTSIZE',(0,0),(-1,-1),10)]))

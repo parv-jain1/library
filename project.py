@@ -84,24 +84,30 @@ def book_issue():
     mys.execute('select copies,issued from books WHERE book_id="%s"'%(bid))
     b=mys.fetchone()
     a=datetime.date.today()
-    try:
-        if b[1]<b[0]:
-            mys.execute("UPDATE books SET issued = issued+%s WHERE book_id ='%s'"%(1,bid))
-            p.commit()
-            sql = "INSERT INTO issues(book_id ,student_id,student_name , Class ,Date,return_date,return_status) VALUES (%s,%s,%s,%s,%s,%s,%s) "
-            val = (bid,int(c_id.get()),s_name.get(),class_.get(),a,'-','not returned')
-            mys.execute(sql,val)
-            p.commit()
-            messagebox.showinfo('congrats','Book Issued')
-        else:
-            messagebox.showinfo('sorry!', 'all books issued')
-    except:
-        messagebox.showinfo('sorry!', 'Book doesnt Exist')
+    mys.execute('select book_id,student_id,return_status from issues where book_id="%s" and student_id="%s" and return_status="not returned"'%(bid,c_id.get()))
+    c=mys.fetchall()
+    if len(c):
+        messagebox.showinfo('','book already issued to the customer')
+    else:
+        try:
+            if b[1]<b[0]:
+                mys.execute("UPDATE books SET issued = issued+%s WHERE book_id ='%s'"%(1,bid))
+                p.commit()
+                sql = "INSERT INTO issues(book_id ,student_id,student_name , Class ,Date,return_date,return_status) VALUES (%s,%s,%s,%s,%s,%s,%s) "
+                val = (bid,int(c_id.get()),s_name.get(),class_.get(),a,'-','not returned')
+                mys.execute(sql,val)
+                p.commit()
+                messagebox.showinfo('congrats','Book Issued')
+            else:
+                messagebox.showinfo('sorry!', 'all books issued')
+        except:
+            messagebox.showinfo('sorry!', 'Book doesnt Exist')
     b_id.delete(0,END)
     c_id.delete(0,END)
     s_name.delete(0,END)
     class_.delete(0,END)
     
+
 def delete():
     global bid,b_id,t
     t=Tk()

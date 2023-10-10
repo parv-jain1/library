@@ -107,7 +107,6 @@ def book_issue():
     s_name.delete(0,END)
     class_.delete(0,END)
     
-
 def delete():
     global bid,b_id,t
     t=Tk()

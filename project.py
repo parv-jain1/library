@@ -84,7 +84,7 @@ def book_issue():
     mys.execute('select copies,issued from books WHERE book_id="%s"'%(bid))
     b=mys.fetchone()
     a=datetime.date.today()
-    mys.execute('select book_id,student_id,return_status from issues where book_id="%s" and student_id="%s" and return_status="not returned"'%(bid,c_id.get()))
+    mys.execute('select book_id,student_id,return_status from issues where student_id="%s" and return_status="not returned"'%(bid,c_id.get()))
     c=mys.fetchall()
     if len(c):
         messagebox.showinfo('','book already issued to the customer')

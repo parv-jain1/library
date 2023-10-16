@@ -265,8 +265,13 @@ if __name__=='__main__' :
     import mysql
     from mysql import connector
     import csv
-    p=mysql.connector.connect(host='localhost',user='root',password='parvjain@1234',database='library')
+    p=mysql.connector.connect(host='localhost',user='root',password='parvjain@1234')
     mys=p.cursor()
+    try:
+        mys.execute('create database library')
+    except:
+        pass
+    p.database='library'
     try:
         mys.execute('create table books (book_id VARCHAR(8), name VARCHAR(255), author VARCHAR(255),copies int,cost int,issued int)')
     except:

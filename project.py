@@ -231,18 +231,22 @@ def detailsissues():
     messagebox.showinfo('','data saved in storage')
 
 def view():
+    global s_id,n
     n=Tk()
     n.geometry('1200x650')
     n.configure(bg='red')
-    Label(n, text="%-30s%-50s%-40s%-30s%-40s%-40s"%('BID','Title','Author','copies','cost','issued'),bg='yellow',font=('times','12','italic')).place(relx=0.01,rely=0.05)
-    mys.execute('select * from books')
-    q=mys.fetchall()
-    y=0.1
-    for i in q:
-            Label(n,text="%-30s%-50s%-40s%-30s%-40s%-40s"%(i[0],i[1],i[2],i[3],i[4],i[5]) ,bg='black', fg='white',font=('times','12','italic')).place(relx=0.01,rely=y)
-            y += 0.05
-    Button(n,text='back',width=20,height=1,command=lambda:(n.destroy(),code()),bg='blue',fg='white',font='10',bd=5).place(relx=0.9,rely=0.9)
+    Label(n,text='Book Name',font=('times','14','italic'),bg='yellow').place(relx=0.20,rely=0.35)
+    s_id=Entry(n,width=50,bd=5)
+    s_id.place(relx=0.38,rely=0.35)
+    Label(n, text="%-30s%-50s%-40s%-30s%-40s%-40s"%('BID','Title','Author','copies','cost','issued'),bg='yellow',font=('times','12','italic')).place(relx=0.01,rely=0.42)
+    Button(n,text='submit',bd=5,command=searchbooks,font=('33'),height=2,width=10).place(relx=0.35,rely=0.85)
+    Button(n,text='Back',bd=5,command=lambda:(n.destroy(),code()),font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)
     n.mainloop()
+def searchbooks():
+    from tkinter import messagebox
+    mys.execute('select * from books where name="%s"'%(s_id.get()))
+    i=mys.fetchall()
+    Label(n,text="%-30s%-50s%-40s%-30s%-40s%-40s"%(i[0][0],i[0][1],i[0][2],i[0][3],i[0][4],i[0][5]) ,bg='black', fg='white',font=('times','12','italic')).place(relx=0.01,rely=0.48)
     
 def code():
     global r

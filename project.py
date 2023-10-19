@@ -242,6 +242,7 @@ def view():
     Button(n,text='submit',bd=5,command=searchbooks,font=('33'),height=2,width=10).place(relx=0.35,rely=0.85)
     Button(n,text='Back',bd=5,command=lambda:(n.destroy(),code()),font=('33'),height=2,width=10).place(relx=0.55,rely=0.85)
     n.mainloop()
+    
 def searchbooks():
     from tkinter import messagebox
     mys.execute('select * from books where name="%s"'%(s_id.get()))
